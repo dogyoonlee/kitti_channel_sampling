@@ -1584,7 +1584,7 @@ def dataset_viz(root_dir, args):  # args.dir, args
                      pc_label=args.pc_label, gt=args.gt, idx=data_idx, fig=figure_bg, view_=MM_PER_VIEW)
             else:
                 show_lidar_with_depth_raw(pc_velo, objects, calib, args.img_fov, img_width, img_height, \
-                depth, img)
+                depth, img, idx=data_idx)
             #show_lidar_with_boxes(pc_velo, objects, calib, True, img_width, img_height, \
             #    objects_pred, depth, img)
         '''

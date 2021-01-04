@@ -90,9 +90,11 @@ def pto_ang_map(velo_points, H=64, W=512, slice=1):
             # if i > (np.radians(67.5) / dphi).astype(int) and i < (
             # np.radians(112.5) / dphi).astype(int):
             # if i > W / 4 and i < (3 * W) / 4:
-            if i < W / 4 or i > (3 * W) / 4:
+            if i < W / 4:
                 depth_map_tmp[1::2, i, :] = 99999
-        depth_map = depth_map_tmp
+            elif i > (3 * W) / 4:
+                depth_map_tmp[0::2, i, :] = 99999
+            depth_map = depth_map_tmp
     else:
         depth_map = depth_map[0::slice, :, :]
     depth_map = depth_map.reshape((-1, 4))
