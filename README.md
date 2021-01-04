@@ -27,13 +27,13 @@ $ python kitti_visualize_raw.py --seq $seq_num --vis --show_lidar_with_depth --i
 ### Visualize Single Downsampled Kitti Data
 
 ```
-$ python kitti_visualize_raw.py --sparse --seq 0000 --vis --show_lidar_with_depth --sparse_dir $sparse_lidar_directory
+$ python kitti_visualize_raw.py --sparse --seq 0000 --vis --show_lidar_with_depth --sparse_dir $sparse_single_lidar_directory
 ```
 
 ### Visualize Multi Downsampled Kitti Data
 
 ```
-$ python kitti_visualize_raw.py --sparse --seq 0000 --vis --show_lidar_with_depth --sparse_dir $sparse_lidar_directory
+$ python kitti_visualize_raw.py --sparse --seq 0000 --vis --show_lidar_with_depth --sparse_dir $sparse_multi_lidar_directory
 ```
 
 
