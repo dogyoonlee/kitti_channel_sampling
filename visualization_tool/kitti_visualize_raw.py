@@ -229,7 +229,7 @@ class kitti_object_sparse(object):
     def __init__(self, root_dir, sparse_dir, args=None):
         '''root_dir contains training and testing folders'''
         self.root_dir = root_dir  # args.dir = /SSD/Dataset/kitti_t_o
-        self.sparse_dir = sparse_dir # ../sparse_lidar_results/4channel
+        self.sparse_dir = sparse_dir  # ../sparse_lidar_results/4channel
         self.split = args.split  # training
         print(root_dir, args.split)
         self.split_dir = os.path.join(
@@ -866,38 +866,36 @@ def show_lidar_with_depth(pc_velo,
         print("==> save filename : ", save_filename)
         mlab.clf()
 
+
 def show_lidar_with_depth_raw(pc_velo,
-                          objects,
-                          calib,
-                          img_fov=False,
-                          img_width=None,
-                          img_height=None,
-                          depth=None,
-                          cam_img=None,
-                          constraint_box=False,
-                          pc_label=False,
-                          save=False,
-                          gt=False,
-                          save_velo_dir=None,
-                          idx=None,
-                          fig=None,
-                          view_=None):
+                              objects,
+                              calib,
+                              img_fov=False,
+                              img_width=None,
+                              img_height=None,
+                              depth=None,
+                              cam_img=None,
+                              constraint_box=False,
+                              pc_label=False,
+                              save=False,
+                              gt=False,
+                              save_velo_dir=None,
+                              idx=None,
+                              fig=None,
+                              view_=None):
     ''' Show all LiDAR points.
         Draw 3d box in LiDAR point cloud (in velo coord system) '''
     if args.pred is False:
         fig = mlab.figure(figure=None,
-                                bgcolor=(0, 0, 0),
-                                fgcolor=None,
-                                engine=None,
-                                size=(1600, 1000))
-        view_=180, 40, [
-              24, -1.04700089, -2.03249991
-              ], 120.0
+                          bgcolor=(0, 0, 0),
+                          fgcolor=None,
+                          engine=None,
+                          size=(1600, 1000))
+        view_ = 180, 40, [24, -1.04700089, -2.03249991], 120.0
     if img_fov:
         pc_velo_index = get_lidar_index_in_image_fov(pc_velo[:, :3], calib, 0,
                                                      0, img_width, img_height)
         pc_velo = pc_velo[pc_velo_index, :]
-
 
     draw_lidar(pc_velo, fig=fig, pc_label=pc_label, pts_color=(1, 1, 1))
     # Draw depth
@@ -946,8 +944,9 @@ def show_lidar_with_depth_raw(pc_velo,
         mlab.savefig(save_filename, figure=fig)
         print("==> save filename : ", save_filename)
         mlab.clf()
-    
+
     mlab.show(1)
+
 
 def show_segmented_lidar_with_depth(pc_velo,
                                     pc_seg,
@@ -1466,7 +1465,7 @@ def show_lidar_on_image_with_box(pc_velo,
 
 
 def dataset_viz(root_dir, args):  # args.dir, args
-    if args.sparse_dir:
+    if args.sparse:
         dataset = kitti_object_sparse(root_dir, args.sparse_dir, args=args)
     else:
         dataset = kitti_object(root_dir, args=args)
@@ -1588,7 +1587,6 @@ def dataset_viz(root_dir, args):  # args.dir, args
                 depth, img)
             #show_lidar_with_boxes(pc_velo, objects, calib, True, img_width, img_height, \
             #    objects_pred, depth, img)
-
         '''
         '''
         if args.show_lidar_on_image:
@@ -1607,10 +1605,10 @@ def dataset_viz(root_dir, args):  # args.dir, args
             #     continue
             show_occluded_lidar_with_depth(pc_velo, pc_occ, objects, calib, args.img_fov, img_width, img_height, \
                  objects_pred, objects_occ, depth, img, constraint_box=args.const_box, save=args.save_depth, pc_label=args.pc_label, save_velo_dir=save_path)
-        
+
         if args.show_succesive is False:
-            input_str=raw_input()
-        
+            input_str = raw_input()
+
         mlab.clf()
         if args.show_succesive:
             mlab.close(all=True)
@@ -1999,6 +1997,10 @@ if __name__ == '__main__':
                         default="../data/kitti_t_o",
                         metavar='N',
                         help='input  (default: data/object)')
+    parser.add_argument('-spt',
+                        '--sparse',
+                        action='store_true',
+                        help='sparse true')
     parser.add_argument('-spd',
                         '--sparse_dir',
                         type=str,
@@ -2131,8 +2133,8 @@ if __name__ == '__main__':
     parser.add_argument('--show_occluded_lidar_with_depth',
                         action='store_true',
                         help='show occluded lidar')
-    parser.add_argument('--show_succesive', 
-                        action='store_true', 
+    parser.add_argument('--show_succesive',
+                        action='store_true',
                         help='show succesive scenes')
     args = parser.parse_args()
     # print("args.preddir : \n", args.preddir)
