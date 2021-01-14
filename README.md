@@ -36,6 +36,7 @@ $ python kitti_visualize_raw.py --sparse --seq 0000 --vis --show_lidar_with_dept
 $ python kitti_visualize_raw.py --sparse --seq 0000 --vis --show_lidar_with_depth --sparse_dir $sparse_multi_lidar_directory
 ```
 
+* This codes are revised based on [Pseudo LiDAR++](https://github.com/mileyan/Pseudo_Lidar_V2) repository
 
 <!-- [[Paper]](paper_address) -->
 
