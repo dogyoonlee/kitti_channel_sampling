@@ -1608,6 +1608,7 @@ def dataset_viz(root_dir, args):  # args.dir, args
 
         if args.show_succesive is False:
             input_str = raw_input()
+            mlab.close()
 
         mlab.clf()
         if args.show_succesive:
