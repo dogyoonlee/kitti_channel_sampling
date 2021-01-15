@@ -144,7 +144,7 @@ def gen_sparse_points(lidar_data_path, args):
                        H=args.H,
                        W=args.W,
                        slice=args.slice,
-                       slice_except=args.slice_except_height,
+                       slice_except=args.slice_except,
                        multi_ratio=args.multi_ratio)
 
 
@@ -213,7 +213,7 @@ if __name__ == '__main__':
     parser.add_argument('--multi_lidar',
                         action='store_true',
                         help='mimic the multi lidar environment')
-    parser.add_argument('--slice_except_height', default=0, type=int)
+    parser.add_argument('--slice_except', default=0, type=int)
     parser.add_argument('--multi_ratio', default=4, type=int)
     # parser.add_argument('--channel', default=4, type=int)
     args = parser.parse_args()

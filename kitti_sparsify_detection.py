@@ -143,7 +143,7 @@ def gen_sparse_points(lidar_data_path, args):
                        H=args.H,
                        W=args.W,
                        slice=args.slice,
-                       slice_except=args.slice_except_height,
+                       slice_except=args.slice_except,
                        multi_ratio=args.multi_ratio)
 
 
