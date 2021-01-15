@@ -50,7 +50,12 @@ def pto_rec_map(velo_points, H=64, W=512, D=800):
     return depth_map
 
 
-def pto_ang_map(velo_points, H=64, W=512, slice=1):
+def pto_ang_map(velo_points,
+                H=64,
+                W=512,
+                slice=1,
+                slice_except=0,
+                multi_ratio=4):
     """
     :param H: the row num of depth map, could be 64(default), 32, 16
     :param W: the col num of depth map
@@ -85,18 +90,28 @@ def pto_ang_map(velo_points, H=64, W=512, slice=1):
     depth_map[theta_, phi_, 3] = i
 
     if args.multi_lidar:
-        depth_map_tmp = depth_map[0::int(slice / 2), :, :]
+        if slice_except is not 0:
+            depth_map_tmp = depth_map[slice_except:(H - slice_except)]
+            depth_map_tmp = depth_map_tmp[0::int(slice / 2), :, :]
+        else:
+            depth_map_tmp = depth_map[0::int(slice / 2), :, :]
         for i in range(W):
             # if i > (np.radians(67.5) / dphi).astype(int) and i < (
             # np.radians(112.5) / dphi).astype(int):
             # if i > W / 4 and i < (3 * W) / 4:
-            if i < W / 4:
+            if i < W / multi_ratio:
                 depth_map_tmp[1::2, i, :] = 99999
-            elif i > (3 * W) / 4:
+            elif i > ((multi_ratio - 1) * W) / multi_ratio:
                 depth_map_tmp[0::2, i, :] = 99999
+
             depth_map = depth_map_tmp
     else:
-        depth_map = depth_map[0::slice, :, :]
+        if slice_except is not 0:
+            depth_map_tmp = depth_map[slice_except:(H - slice_except)]
+            depth_map_tmp = depth_map_tmp[0::int(slice / 2), :, :]
+        else:
+            depth_map_tmp = depth_map[0::int(slice / 2), :, :]
+        depth_map = depth_map_tmp
     depth_map = depth_map.reshape((-1, 4))
 
     if args.multi_lidar:
@@ -125,7 +140,12 @@ def gen_sparse_points(lidar_data_path, args):
     pc_velo = pc_velo[valid_inds]
     # print('pc_velo: ', pc_velo)
     # print('pc_velo shape: ', pc_velo.shape)
-    return pto_ang_map(pc_velo, H=args.H, W=args.W, slice=args.slice)
+    return pto_ang_map(pc_velo,
+                       H=args.H,
+                       W=args.W,
+                       slice=args.slice,
+                       slice_except=args.slice_except_height,
+                       multi_ratio=args.multi_ratio)
 
 
 def gen_sparse_points_seq(lidar_path, outputfolder, seq):
@@ -193,6 +213,8 @@ if __name__ == '__main__':
     parser.add_argument('--multi_lidar',
                         action='store_true',
                         help='mimic the multi lidar environment')
+    parser.add_argument('--slice_except_height', default=0, type=int)
+    parser.add_argument('--multi_ratio', default=4, type=int)
     # parser.add_argument('--channel', default=4, type=int)
     args = parser.parse_args()
 
