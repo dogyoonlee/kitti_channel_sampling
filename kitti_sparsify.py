@@ -54,7 +54,9 @@ def pto_ang_map(velo_points,
                 H=64,
                 W=512,
                 slice=1,
-                slice_except=0,
+                slice_height=False,
+                slice_except_top=0,
+                slice_except_bottom=0,
                 multi_ratio=4):
     """
     :param H: the row num of depth map, could be 64(default), 32, 16
@@ -90,8 +92,9 @@ def pto_ang_map(velo_points,
     depth_map[theta_, phi_, 3] = i
 
     if args.multi_lidar:
-        if slice_except is not 0:
-            depth_map_tmp = depth_map[slice_except:(H - slice_except)]
+        if slice_height is True:
+            depth_map_tmp = depth_map[slice_except_top:(H -
+                                                        slice_except_bottom)]
             depth_map_tmp = depth_map_tmp[0::int(slice / 2), :, :]
         else:
             depth_map_tmp = depth_map[0::int(slice / 2), :, :]
@@ -106,8 +109,9 @@ def pto_ang_map(velo_points,
 
             depth_map = depth_map_tmp
     else:
-        if slice_except is not 0:
-            depth_map_tmp = depth_map[slice_except:(H - slice_except)]
+        if slice_height is True:
+            depth_map_tmp = depth_map[slice_except_top:(H -
+                                                        slice_except_bottom)]
             depth_map_tmp = depth_map_tmp[0::int(slice / 2), :, :]
         else:
             depth_map_tmp = depth_map[0::int(slice / 2), :, :]
@@ -144,7 +148,9 @@ def gen_sparse_points(lidar_data_path, args):
                        H=args.H,
                        W=args.W,
                        slice=args.slice,
-                       slice_except=args.slice_except,
+                       slice_height=args.slice_height,
+                       slice_except_bottom=args.slice_except_bottom,
+                       slice_except_top=args.slice_except_top,
                        multi_ratio=args.multi_ratio)
 
 
@@ -213,7 +219,11 @@ if __name__ == '__main__':
     parser.add_argument('--multi_lidar',
                         action='store_true',
                         help='mimic the multi lidar environment')
-    parser.add_argument('--slice_except', default=0, type=int)
+    parser.add_argument('--slice_height',
+                        action='store_true',
+                        help='slice along height')
+    parser.add_argument('--slice_except_top', default=0, type=int)
+    parser.add_argument('--slice_except_bottom', default=0, type=int)
     parser.add_argument('--multi_ratio', default=4, type=int)
     # parser.add_argument('--channel', default=4, type=int)
     args = parser.parse_args()
