@@ -112,9 +112,9 @@ def pto_ang_map(velo_points,
         if slice_height is True:
             depth_map_tmp = depth_map[slice_except_top:(H -
                                                         slice_except_bottom)]
-            depth_map_tmp = depth_map_tmp[0::int(slice / 2), :, :]
+            depth_map_tmp = depth_map_tmp[0::int(slice), :, :]
         else:
-            depth_map_tmp = depth_map[0::int(slice / 2), :, :]
+            depth_map_tmp = depth_map[0::int(slice), :, :]
         depth_map = depth_map_tmp
     depth_map = depth_map.reshape((-1, 4))
 
