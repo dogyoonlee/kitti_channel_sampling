@@ -13,7 +13,7 @@ import numpy as np
 import tqdm
 
 
-def pto_rec_map(velo_points, H=64, W=512, D=800):
+def pto_rec_map_original(velo_points, H=64, W=512, D=800):
     # depth, width, height
     valid_inds = (
         (velo_points[:, 0] < 80)
@@ -50,6 +50,99 @@ def pto_rec_map(velo_points, H=64, W=512, D=800):
     depth_map[x_grid, y_grid, z_grid, 3] = i
     depth_map = depth_map.reshape((-1, 4))
     depth_map = depth_map[depth_map[:, 0] != -1.0]
+    return depth_map
+
+
+def pto_ang_map_sampling4(
+    velo_points,
+    H=64,
+    W=512,
+    slice=1,
+    slice_height=False,
+    slice_except_top=0,
+    slice_except_bottom=0,
+    multi_ratio=4,
+):
+    """
+    :param H: the row num of depth map, could be 64(default), 32, 16
+    :param W: the col num of depth map
+    :param slice: output every slice lines
+    y : +/_ 50 is max/min
+    """
+    # x: front, y: left, z: up
+    dtheta = np.radians(0.4 * 64.0 / H)
+    dphi = np.radians(90.0 / W)
+    x, y, z, i = (
+        velo_points[:, 0],
+        velo_points[:, 1],
+        velo_points[:, 2],
+        velo_points[:, 3],
+    )
+    d = np.sqrt(x ** 2 + y ** 2 + z ** 2)
+    r = np.sqrt(x ** 2 + y ** 2)
+    d[d == 0] = 0.000001
+    r[r == 0] = 0.000001
+    phi = np.radians(45.0) - np.arcsin(y / r)  # 45 - angle from x axis to y axis
+    phi_ = (phi / dphi).astype(int)  # y axis pixel value
+    phi_[phi_ < 0] = 0
+    phi_[phi_ >= W] = W - 1  # handling exception
+    theta = np.radians(2.0) - np.arcsin(z / d)
+    theta_ = (theta / dtheta).astype(int)
+    theta_[theta_ < 0] = 0
+    theta_[theta_ >= H] = H - 1
+
+    depth_map = -np.ones((H, W, 4))
+    depth_map[theta_, phi_, 0] = x
+    depth_map[theta_, phi_, 1] = y
+    depth_map[theta_, phi_, 2] = z
+    depth_map[theta_, phi_, 3] = i
+
+    cut_val = int(50 * (1 / multi_ratio))
+    if args.sampling_num3_4:
+        slice_except_top = int((64 - int(64 / int(slice / 2))) / 2)
+        slice_except_bottom = slice_except_top
+        slice_height = True
+    # For single channel sampling first
+    # odd
+    if slice_height is True:
+        odd_depth_map_tmp = depth_map[slice_except_top : (H - slice_except_bottom)]
+        odd_depth_map_tmp = odd_depth_map_tmp[0 :: int(slice / 2), :, :]
+    else:
+        odd_depth_map_tmp = depth_map[0 :: int(slice / 2), :, :]
+    odd_depth_map = odd_depth_map_tmp
+    odd_depth_map = odd_depth_map.reshape((-1, 4))
+
+    odd_remove_idx = list()
+    for i in range(len(odd_depth_map)):
+        if odd_depth_map[i][1] >= cut_val:
+            odd_remove_idx.append(i)
+    odd_remove_idx = np.array(odd_remove_idx)
+    odd_depth_map = np.delete(odd_depth_map, odd_remove_idx, axis=0)
+
+    odd_depth_map = odd_depth_map[odd_depth_map[:, 0] != -1.0]
+
+    # even
+    # 나중에 함수화시켜서 다시 정리할 것
+    if slice_height is True:
+        even_depth_map_tmp = depth_map[slice_except_top : (H - slice_except_bottom)]
+        even_depth_map_tmp = even_depth_map_tmp[1 :: int(slice / 2), :, :]
+    else:
+        even_depth_map_tmp = depth_map[1 :: int(slice / 2), :, :]
+    even_depth_map = even_depth_map_tmp
+    even_depth_map = even_depth_map.reshape((-1, 4))
+
+    even_remove_idx = list()
+    for i in range(len(even_depth_map)):
+        if even_depth_map[i][1] <= cut_val * (-1):
+            even_remove_idx.append(i)
+    even_remove_idx = np.array(even_remove_idx)
+    even_depth_map = np.delete(even_depth_map, even_remove_idx, axis=0)
+
+    even_depth_map = even_depth_map[even_depth_map[:, 0] != -1.0]
+
+    depth_map = np.concatenate((odd_depth_map, even_depth_map), axis=0)
+    # depth_map = depth_map[depth_map[:, 0] != -1.0]
+    # print('depth_map: ', depth_map)
     return depth_map
 
 
@@ -154,16 +247,29 @@ def gen_sparse_points(lidar_data_path, args):
     pc_velo = pc_velo[valid_inds]
     # print('pc_velo: ', pc_velo)
     # print('pc_velo shape: ', pc_velo.shape)
-    return pto_ang_map(
-        pc_velo,
-        H=args.H,
-        W=args.W,
-        slice=args.slice,
-        slice_height=args.slice_height,
-        slice_except_bottom=args.slice_except_bottom,
-        slice_except_top=args.slice_except_top,
-        multi_ratio=args.multi_ratio,
-    )
+    if args.sampling_num4:
+        return pto_ang_map_sampling4(
+            pc_velo,
+            H=args.H,
+            W=args.W,
+            slice=args.slice,
+            slice_height=args.slice_height,
+            slice_except_bottom=args.slice_except_bottom,
+            slice_except_top=args.slice_except_top,
+            multi_ratio=args.multi_ratio,
+        )
+
+    else:
+        return pto_ang_map(
+            pc_velo,
+            H=args.H,
+            W=args.W,
+            slice=args.slice,
+            slice_height=args.slice_height,
+            slice_except_bottom=args.slice_except_bottom,
+            slice_except_top=args.slice_except_top,
+            multi_ratio=args.multi_ratio,
+        )
 
 
 def gen_sparse_points_seq(lidar_path, outputfolder, seq):
@@ -250,6 +356,12 @@ if __name__ == "__main__":
     parser.add_argument("--multi_ratio", default=4, type=int)
     parser.add_argument(
         "--sampling_num3", action="store_true", help="sampling number 3"
+    )
+    parser.add_argument(
+        "--sampling_num4", action="store_true", help="sampling number 3"
+    )
+    parser.add_argument(
+        "--sampling_num3_4", action="store_true", help="sampling number 3"
     )
     # parser.add_argument('--channel', default=4, type=int)
     args = parser.parse_args()
