@@ -114,7 +114,7 @@ def pto_ang_map_sampling4(
     odd_remove_idx = list()
     for i in range(len(odd_depth_map)):
         if odd_depth_map[i][1] >= cut_val:
-            odd_remove_idx.append(i)
+            odd_remove_idx.append(int(i))
     odd_remove_idx = np.array(odd_remove_idx)
     odd_depth_map = np.delete(odd_depth_map, odd_remove_idx, axis=0)
 
@@ -132,8 +132,8 @@ def pto_ang_map_sampling4(
 
     even_remove_idx = list()
     for i in range(len(even_depth_map)):
-        if even_depth_map[i][1] <= cut_val * (-1):
-            even_remove_idx.append(i)
+        if even_depth_map[i][1] <= cut_val * (-1.0):
+            even_remove_idx.append(int(i))
     even_remove_idx = np.array(even_remove_idx)
     even_depth_map = np.delete(even_depth_map, even_remove_idx, axis=0)
 
@@ -221,7 +221,7 @@ def pto_ang_map(
         remove_idx = list()
         for i in range(len(depth_map)):
             if depth_map[i][0] == 99999:
-                remove_idx.append(i)
+                remove_idx.append(int(i))
         remove_idx = np.array(remove_idx)
         depth_map = np.delete(depth_map, remove_idx, axis=0)
 
@@ -407,12 +407,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--sampling_num3", action="store_true", help="sampling number 3"
     )
-    # parser.add_argument(
-    #     "--sampling_num4", action="store_true", help="sampling number 3"
-    # )
-    # parser.add_argument(
-    #     "--sampling_num3_4", action="store_true", help="sampling number 3"
-    # )
+    parser.add_argument(
+        "--sampling_num4", action="store_true", help="sampling number 3"
+    )
+    parser.add_argument(
+        "--sampling_num3_4", action="store_true", help="sampling number 3"
+    )
     # parser.add_argument('--channel', default=4, type=int)
     args = parser.parse_args()
 
