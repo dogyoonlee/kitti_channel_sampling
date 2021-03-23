@@ -96,18 +96,26 @@ def pto_ang_map_sampling4(
     depth_map[theta_, phi_, 2] = z
     depth_map[theta_, phi_, 3] = i
 
-    cut_val = int(50 * (1 / multi_ratio))
+    range_val = np.ceil(
+        np.maximum(
+            np.max(depth_map.reshape((-1, 4))[:, 1], axis=0),
+            (-1.0) * np.min(depth_map.reshape((-1, 4))[:, 1], axis=0),
+        )
+    )
+
+    cut_val = int(range_val * (1 / multi_ratio))
     if args.sampling_num3_4:
         slice_except_top = int((64 - int(64 / int(slice / 2))) / 2)
         slice_except_bottom = slice_except_top
         slice_height = True
     # For single channel sampling first
     # odd
+
     if slice_height is True:
         odd_depth_map_tmp = depth_map[slice_except_top : (H - slice_except_bottom)]
-        odd_depth_map_tmp = odd_depth_map_tmp[0 :: int(slice / 2), :, :]
+        odd_depth_map_tmp = odd_depth_map_tmp[0 :: int(slice), :, :]
     else:
-        odd_depth_map_tmp = depth_map[0 :: int(slice / 2), :, :]
+        odd_depth_map_tmp = depth_map[0 :: int(slice), :, :]
     odd_depth_map = odd_depth_map_tmp
     odd_depth_map = odd_depth_map.reshape((-1, 4))
 
@@ -124,9 +132,9 @@ def pto_ang_map_sampling4(
     # 나중에 함수화시켜서 다시 정리할 것
     if slice_height is True:
         even_depth_map_tmp = depth_map[slice_except_top : (H - slice_except_bottom)]
-        even_depth_map_tmp = even_depth_map_tmp[1 :: int(slice / 2), :, :]
+        even_depth_map_tmp = even_depth_map_tmp[slice // 2 :: int(slice), :, :]
     else:
-        even_depth_map_tmp = depth_map[1 :: int(slice / 2), :, :]
+        even_depth_map_tmp = depth_map[slice // 2 :: int(slice), :, :]
     even_depth_map = even_depth_map_tmp
     even_depth_map = even_depth_map.reshape((-1, 4))
 
@@ -142,6 +150,7 @@ def pto_ang_map_sampling4(
     depth_map = np.concatenate((odd_depth_map, even_depth_map), axis=0)
     # depth_map = depth_map[depth_map[:, 0] != -1.0]
     # print('depth_map: ', depth_map)
+
     return depth_map
 
 
@@ -387,7 +396,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--sparse_lidar_save_path",
-        default="./sparse_lidar_results_det",
+        default="./spar_lidar_res_det",
         help="sparsed lidar path",
     )
     parser.add_argument("--slice", default=1, type=int)
@@ -408,10 +417,10 @@ if __name__ == "__main__":
         "--sampling_num3", action="store_true", help="sampling number 3"
     )
     parser.add_argument(
-        "--sampling_num4", action="store_true", help="sampling number 3"
+        "--sampling_num4", action="store_true", help="sampling number 4"
     )
     parser.add_argument(
-        "--sampling_num3_4", action="store_true", help="sampling number 3"
+        "--sampling_num3_4", action="store_true", help="sampling number 3_4"
     )
     # parser.add_argument('--channel', default=4, type=int)
     args = parser.parse_args()

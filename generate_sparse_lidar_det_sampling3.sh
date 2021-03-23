@@ -1,0 +1,10 @@
+python kitti_sparsify_detection.py --det --slice 2 --data_mode training --multi_lidar --sampling_num3 --sparse_lidar_save_path ./spar_lidar_res_det/sparse_lidar_det_sampling3
+python kitti_sparsify_detection.py --det --slice 2 --data_mode testing --multi_lidar --sampling_num3 --sparse_lidar_save_path ./spar_lidar_res_det/sparse_lidar_det_sampling3
+python kitti_sparsify_detection.py --det --slice 4 --data_mode training --multi_lidar --sampling_num3 --sparse_lidar_save_path ./spar_lidar_res_det/sparse_lidar_det_sampling3
+python kitti_sparsify_detection.py --det --slice 4 --data_mode testing --multi_lidar ---sampling_num3 --sparse_lidar_save_path ./spar_lidar_res_det/sparse_lidar_det_sampling3
+python kitti_sparsify_detection.py --det --slice 8 --data_mode training --multi_lidar --sampling_num3 --sparse_lidar_save_path ./spar_lidar_res_det/sparse_lidar_det_sampling3
+python kitti_sparsify_detection.py --det --slice 8 --data_mode testing --multi_lidar --sampling_num3 --sparse_lidar_save_path ./spar_lidar_res_det/sparse_lidar_det_sampling3
+python kitti_sparsify_detection.py --det --slice 16 --data_mode training --multi_lidar --sampling_num3 --sparse_lidar_save_path ./spar_lidar_res_det/sparse_lidar_det_sampling3
+python kitti_sparsify_detection.py --det --slice 16 --data_mode testing --multi_lidar --sampling_num3 --sparse_lidar_save_path ./spar_lidar_res_det/sparse_lidar_det_sampling3
+python kitti_sparsify_detection.py --det --slice 32 --data_mode training --multi_lidar --sampling_num3 --sparse_lidar_save_path ./spar_lidar_res_det/sparse_lidar_det_sampling3
+python kitti_sparsify_detection.py --det --slice 32 --data_mode testing --multi_lidar --sampling_num3 --sparse_lidar_save_path ./spar_lidar_res_det/sparse_lidar_det_sampling3
